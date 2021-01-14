@@ -1,5 +1,7 @@
 package level_28.bobrArchivator;
 
+import level_28.bobrArchivator.command.ExitCommand;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,5 +24,10 @@ public class Archiver {
             e.printStackTrace();
         }
 
+        try {
+            new ExitCommand().execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
