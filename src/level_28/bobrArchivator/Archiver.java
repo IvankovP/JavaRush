@@ -1,33 +1,39 @@
 package level_28.bobrArchivator;
 
-import level_28.bobrArchivator.command.ExitCommand;
-
-import java.io.BufferedReader;
+import level_28.bobrArchivator.exception.WrongZipFileException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.Paths;
 
 public class Archiver {
 
     public static void main(String[] args) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("Enter file name archive:");
-        String pathEndFile = bufferedReader.readLine();
+        Operation operation = null;
 
-        ZipFileManager zipFileManager = new ZipFileManager(Paths.get(pathEndFile));
+        do {
+            try {
+                operation = Archiver.askOperation();
+                CommandExecutor.execute(operation);
+            } catch (WrongZipFileException e) {
+                ConsoleHelper.writeMessage("Вы не выбрали файл архива или выбрали неверный файл.");
+            } catch (Exception e) {
+                ConsoleHelper.writeMessage("Произошла ошибка. Проверьте введенные данные.");
+            }
+        } while (operation != Operation.EXIT);
+    }
 
-        System.out.println("Enter file name for archive:");
-        String pathFileForArchive = bufferedReader.readLine();
-        try {
-            zipFileManager.createZip(Paths.get(pathFileForArchive));
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static Operation askOperation() throws IOException {
+        ConsoleHelper.writeMessage("Выберите операцию:");
+        ConsoleHelper.writeMessage(Operation.CREATE.ordinal() + " - упаковать файл");
+        ConsoleHelper.writeMessage(Operation.ADD.ordinal() + " - добавить файл в архив");
+        ConsoleHelper.writeMessage(Operation.REMOVE.ordinal() + " - удалить файл из архива");
+        ConsoleHelper.writeMessage(Operation.EXTRACT.ordinal() + " - распаковать архив");
+        ConsoleHelper.writeMessage(Operation.CONTENT.ordinal() + " - просмотреть содержимое файла");
+        ConsoleHelper.writeMessage(Operation.EXIT.ordinal() + " - выход");
+
+        int operationIndex = ConsoleHelper.readInt();
+
+        for (Operation operation: Operation.values()) {
+            if (operationIndex == operation.ordinal()) return operation;
         }
-
-        try {
-            new ExitCommand().execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        return null;
     }
 }

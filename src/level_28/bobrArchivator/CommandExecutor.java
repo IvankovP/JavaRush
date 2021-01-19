@@ -18,12 +18,8 @@ public class CommandExecutor {
         ALL_KNOWN_COMMANDS_MAP.put(Operation.EXIT, new ExitCommand());
     }
 
-    public static void execute(Operation operation) {
-        try {
-            ALL_KNOWN_COMMANDS_MAP.get(operation).execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void execute(Operation operation) throws Exception {
+        ALL_KNOWN_COMMANDS_MAP.get(operation).execute();
     }
 
     private CommandExecutor() {}
