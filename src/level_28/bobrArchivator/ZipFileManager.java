@@ -1,14 +1,15 @@
 package level_28.bobrArchivator;
 
 import level_28.bobrArchivator.exception.PathIsNotFoundException;
+import level_28.bobrArchivator.exception.WrongZipFileException;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 public class ZipFileManager {
@@ -47,5 +48,23 @@ public class ZipFileManager {
     private void copyData(InputStream in, OutputStream out) throws IOException {
         int byteReadFile = 0;
         while ((byteReadFile = in.read()) > 0) out.write(byteReadFile);
+    }
+
+    public List<FileProperties> getFilesList() throws Exception {
+        if (!Files.isRegularFile(zipFile)) throw new WrongZipFileException();
+
+        List<FileProperties> filePropertiesList = new ArrayList<>();
+
+        try(ZipInputStream zipInputStream = new ZipInputStream(Files.newInputStream(zipFile))) {
+            ZipEntry zipEntry;
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                copyData(zipInputStream, byteArrayOutputStream);
+
+                filePropertiesList.add(new FileProperties(zipEntry.getName(), zipEntry.getSize(), zipEntry.getCompressedSize(), zipEntry.getMethod()));
+            }
+        }
+
+        return filePropertiesList;
     }
 }
