@@ -11,7 +11,6 @@ public class ConsoleHelper {
 
     public static String readString() {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("Enter string:");
         try {
             return bufferedReader.readLine();
         } catch (IOException e) {
@@ -22,11 +21,10 @@ public class ConsoleHelper {
 
     public static int readInt() {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("Enter number:");
         try {
             return Integer.parseInt(bufferedReader.readLine());
         } catch (IOException e) {
-            System.out.println("You need to enter a number. Try again");
+            System.out.println("Нужно ввести цифру. Попробуйте снова");
             return ConsoleHelper.readInt();
         }
     }
