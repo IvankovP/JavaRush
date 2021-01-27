@@ -97,6 +97,7 @@ public class ZipFileManager {
 
         try(ZipInputStream zipInputStream = new ZipInputStream(Files.newInputStream(zipFile));
             ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(tempFileZip))) {
+
             ZipEntry zipEntry;
             while ((zipEntry = zipInputStream.getNextEntry()) != null) {
                 if (pathList.contains(Paths.get(zipEntry.getName()))) {
@@ -113,5 +114,48 @@ public class ZipFileManager {
 
     public void removeFile(Path path) throws Exception {
         removeFiles(Collections.singletonList(path));
+    }
+
+    public void addFiles(List<Path> absolutePathList) throws Exception {
+        if (!Files.isRegularFile(zipFile)) throw new WrongZipFileException();
+
+        Path tempFileZip = Files.createTempFile(zipFile.getFileName().toString(), "");
+
+        try(ZipInputStream zipInputStream = new ZipInputStream(Files.newInputStream(zipFile));
+            ZipOutputStream zipOutputStream = new ZipOutputStream(Files.newOutputStream(tempFileZip))) {
+
+            ZipEntry zipEntry;
+            List<Path> tempFileNamesList = new ArrayList<>();
+
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+
+                if (tempFileNamesList.contains(zipEntry.getName())) {
+                    ConsoleHelper.writeMessage("");
+                    continue;
+                }
+                tempFileNamesList.add(Paths.get(zipEntry.getName()));
+
+                zipOutputStream.putNextEntry(zipEntry);
+                copyData(zipInputStream, zipOutputStream);
+                zipOutputStream.closeEntry();
+            }
+
+            for (Path path : absolutePathList) {
+                if (Files.exists(path) && Files.isRegularFile(path)) {
+                    if (tempFileNamesList.contains(path.getFileName())) {
+                        ConsoleHelper.writeMessage("Файл " + path + " уже есть в архиве.");
+                    } else {
+                        addNewZipEntry(zipOutputStream, path.getParent(), path.getFileName());
+                        ConsoleHelper.writeMessage("Файл " + path + " добавлен в архив.");
+                    }
+                } else throw new PathIsNotFoundException();
+            }
+
+        }
+        Files.move(tempFileZip, zipFile, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    public void addFile(Path absolutePath) throws Exception {
+        addFiles(Collections.singletonList(absolutePath));
     }
 }
