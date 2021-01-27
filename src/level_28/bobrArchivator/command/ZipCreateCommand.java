@@ -15,8 +15,7 @@ public class ZipCreateCommand extends ZipCommand {
             ZipFileManager zipFileManager = getZipFileManager();
 
             ConsoleHelper.writeMessage("Введите имя файла/директории, которые хотите заархивировать");
-            String fileForArchiver = ConsoleHelper.readString();
-            Path filePathForArchiver = Paths.get(fileForArchiver);
+            Path filePathForArchiver = Paths.get(ConsoleHelper.readString());
 
             zipFileManager.createZip(filePathForArchiver);
             ConsoleHelper.writeMessage("Архив создан.");
