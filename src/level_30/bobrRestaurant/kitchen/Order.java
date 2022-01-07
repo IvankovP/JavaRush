@@ -18,6 +18,14 @@ public class Order {
 
     @Override
     public String toString() {
-        return dishes.size() == 0 ? "" : String.format("Your order: %s of %s", Arrays.toString(dishes.toArray()), tablet.toString());
+        return dishes.size() == 0 ? "" : String.format("Your order: %s of %s, cooking time %dmin", Arrays.toString(dishes.toArray()), tablet.toString(), getTotalCookingTime());
+    }
+
+    public int getTotalCookingTime() {
+        return dishes.stream().mapToInt(Dish::getDuration).sum();
+    }
+
+    public boolean isEmpty() {
+        return dishes.isEmpty();
     }
 }
